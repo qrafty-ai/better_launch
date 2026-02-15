@@ -739,8 +739,9 @@ Please fasten your seatbelts and secure all baggage underneath your chair.
         subdir: str = None,
         *,
         qualifier: str | Node = None,
+        matching_only: bool = False,
     ) -> dict[str, Any]:
-        """Load parameters from a yaml file located through [find][].
+        """Load parameters from a yaml file located through :py:meth:`find`.
 
         If the config only contains a `ros__parameters` section the entire config is returned regardless of whether `qualifier` was passed. Otherwise, if `qualifier` is provided, the loaded config dict is searched for a matching section. If no matching section can be found a ValueError will be raised.
 
@@ -757,13 +758,15 @@ Please fasten your seatbelts and secure all baggage underneath your chair.
         Parameters
         ----------
         package : str
-            A package to search for the config file. May be `None` (see [find][]).
+            A package to search for the config file. May be `None` (see :py:meth:`find`).
         configfile : str
             The name of the config file to locate.
         subdir : str, optional
             A path fragment that the config file must be located in.
         qualifier : str | Node, optional
             Used to specifiy which section of the config to return.
+        matching_only : bool, optional
+            If True, load only those params matching the qualifier. If no qualifier was given, only load global params (and those under `/**`).
 
         Returns
         -------
@@ -781,18 +784,16 @@ Please fasten your seatbelts and secure all baggage underneath your chair.
 
         with open(path) as f:
             content = f.read()
+            is_ros_params = "ros__parameters" in content
             params = yaml.safe_load(content)
+
+        # Return the entire config if it doesn't follow the ros pattern
+        if not is_ros_params:
+            return params
 
         # No node- or namespace specific sections
         if "ros__parameters" in params:
             return params["ros__parameters"]
-
-        # Return the entire config if it doesn't follow the ros pattern
-        if not qualifier:
-            return params
-
-        if not qualifier.endswith("*"):
-            qualifier += "/*"
 
         final_params = {}
 
@@ -806,16 +807,26 @@ Please fasten your seatbelts and secure all baggage underneath your chair.
                     val = val.get("ros__parameters", val)
 
                     # Global parameters should always be included
-                    if not path or fnmatch(path, qualifier):
+                    if (
+                        not path
+                        or not matching_only
+                        or (qualifier and fnmatch(qualifier, path))
+                    ):
                         for param_name, param_val in val.items():
-                            final_params[param_name] = param_val
-
-                elif fnmatch(f"{path}/{key}", qualifier):
-                    final_params[key] = val
+                            param_path = f"{path}:{param_name}" if path else param_name
+                            final_params[param_path] = param_val
 
                 elif isinstance(val, dict):
                     branch_path = f"{path}/{key}" if path else key
                     todo.append((branch_path, val))
+
+                else:
+                    # Some value that's not a dict and not a ros__parameters, just add it
+                    leaf_path = f"{path}/{key}" if path else key
+                    if not matching_only or (
+                        qualifier and fnmatch(qualifier, leaf_path)
+                    ):
+                        final_params[leaf_path] = val
 
         return final_params
 
