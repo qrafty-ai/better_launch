@@ -40,7 +40,6 @@ $> bl my_package my_launch_file.py --enable_x True
 
 *Do I have your attention? Read on to learn more!*
 
----
 
 # 🧞‍♀️ Everything you need to know
 - [The What and Why](https://dfki-ric.github.io/better_launch/about/why/)
@@ -49,7 +48,6 @@ $> bl my_package my_launch_file.py --enable_x True
 - [HowTo](https://dfki-ric.github.io/better_launch/howto/python/)
 - [Examples](examples/)
 
----
 
 # ⛲ Highlights
 
@@ -98,7 +96,6 @@ message = "Found cube at ${a_simple_cube}"
 
 Under the hood, TOML launchfiles result in calls to the `BetterLaunch` singleton, but offer a more focused and constrained feature set. If you are still missing ROS1 XML launchfiles (and substitutions like `${arg my_arg}`!), these are for you!
 
----
 
 # 🌱 Contributions
 
@@ -116,6 +113,6 @@ Under the hood, TOML launchfiles result in calls to the `BetterLaunch` singleton
 
 ---
 
-*Copyright 2025, [DFKI GmbH](http://www.dfki.de) / [Robotics Innovation Center](http://robotik.dfki-bremen.de/en/startpage.html)*
+*Copyright 2026, [DFKI GmbH](http://www.dfki.de) / [Robotics Innovation Center](http://robotik.dfki-bremen.de/en/startpage.html)*
 
 ![dfki-logo](docs/assets/images/dfki.png)

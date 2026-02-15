@@ -409,7 +409,7 @@ def get_launchfile_command(launchfile: LaunchFile, ctx: click.Context) -> click.
     return cmd
 
 
-class LaunchfileSelectionCLI(click.MultiCommand):
+class LaunchfileSelectionCLI(click.Group):
     def __init__(self, package: str, **kwargs):
         """This subcommand will handle selecting a launch file from the provided ROS package.
 
@@ -486,7 +486,7 @@ class LaunchfileSelectionCLI(click.MultiCommand):
         return executables
 
 
-class PackageSelectionCLI(click.MultiCommand):
+class PackageSelectionCLI(click.Group):
     def __init__(self, **kwargs):
         """This subcommand will help in selecting a ROS package."""
         options = [

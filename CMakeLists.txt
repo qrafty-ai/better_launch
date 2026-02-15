@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(better_launch)
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 
 # Run via `colcon test --packages-select better_launch`. 
 # Examine results with `colcon test-result --all`

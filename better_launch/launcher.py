@@ -739,7 +739,6 @@ Please fasten your seatbelts and secure all baggage underneath your chair.
         subdir: str = None,
         *,
         qualifier: str | Node = None,
-        trim: bool = True,
     ) -> dict[str, Any]:
         """Load parameters from a yaml file located through [find][].
 
@@ -765,8 +764,6 @@ Please fasten your seatbelts and secure all baggage underneath your chair.
             A path fragment that the config file must be located in.
         qualifier : str | Node, optional
             Used to specifiy which section of the config to return.
-        trim : bool, optional
-            Remove the matching qualifier paths from the returned dict's keys if true and a qualifier was specified.
 
         Returns
         -------
