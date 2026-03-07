@@ -5,10 +5,11 @@ import signal
 import logging
 import asyncio  # keep this so we can use await and async def
 import threading
+import sys
 from multiprocessing import Process, Queue
 import subprocess
 import osrf_pycommon.process_utils
-from setproctitle import setproctitle, getproctitle
+from setproctitle import setproctitle
 
 from better_launch.utils.better_logging import (
     LogSink,
@@ -31,8 +32,16 @@ def _launchservice_worker(
     config: settings._Settings,
 ) -> None:
     """This function will run in a child process and will not have access to any objects already in memory UNLESS they are passed to it as arguments. See the comments for further details."""
-    # Makes it easier to tell what's going on in the process table
-    setproctitle(f"{getproctitle()} ({name})")
+    # Keep process title short and stable. Using getproctitle() here can pull in
+    # long parent CLI args, which may leak into ROS launch logger naming and
+    # exceed filesystem filename limits.
+    setproctitle(f"better_launch ({name})")
+
+    # ROS2 launch logging may derive log file names from process argv. The parent process
+    # often carries long launch CLI arguments, which can exceed filesystem filename limits.
+    # Keep only the executable entry to avoid "File name too long" in launch logs.
+    if len(sys.argv) > 1:
+        sys.argv = [sys.argv[0]]
 
     if platform.system() != "Windows":
         # On unix-based systems this will make this process independent from the host process. This
@@ -182,7 +191,9 @@ class Ros2LaunchWrapper(AbstractNode):
             output=output,
         )
 
-        self._launchservice_args = launchservice_args
+        self._launchservice_args = (
+            [] if launchservice_args is None else launchservice_args
+        )
 
         self._process: Process = None
         self._launch_action_queue = Queue()
